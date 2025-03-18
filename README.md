@@ -1,0 +1,2 @@
+# JobFinder
+ JobFinder is a job searching platform built with Spring Boot and Thymeleaf. This project allows users to register, log in, and search for job opportunities based on various filters. Employers (Admin role) can view candidate profiles, filter them based on criteria like experience and education, and manage job postings. The system features secure password handling with Spring Security, logging of all actions, and database storage using PostgreSQL
