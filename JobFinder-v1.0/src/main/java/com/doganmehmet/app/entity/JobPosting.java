@@ -32,6 +32,5 @@ public class JobPosting {
     private Company company;
 
     @OneToMany(mappedBy = "jobPosting", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "job_applications")
     private List<JobApplication> jobApplications;
 }

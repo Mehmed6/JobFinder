@@ -27,6 +27,5 @@ public class Company {
     private List<User> users;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "job_postings")
     private List<JobPosting> jobPostings;
 }
