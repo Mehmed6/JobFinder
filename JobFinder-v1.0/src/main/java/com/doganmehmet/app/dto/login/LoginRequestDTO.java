@@ -1,4 +1,4 @@
-package com.doganmehmet.app.dto;
+package com.doganmehmet.app.dto.login;
 
 import lombok.Getter;
 import lombok.Setter;

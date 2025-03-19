@@ -8,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,9 +28,22 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         var user = m_userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
 
-        if (!m_passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword()))
-            throw new ApiException(MyError.PASSWORD_INCORRECT);
+        if (user.isBlocked())
+            throw new ApiException(MyError.USER_BLOCKED);
 
+        if (!m_passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
+            user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+
+            if (user.getFailedLoginAttempts() >= 3)
+                user.setBlocked(true);
+
+            m_userRepository.save(user);
+
+            throw new ApiException(MyError.PASSWORD_INCORRECT, "Remaining attempts: " + (3 - user.getFailedLoginAttempts()));
+        }
+
+        user.setFailedLoginAttempts(0);
+        m_userRepository.save(user);
         return new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword(), user.getAuthorities());
     }
 
