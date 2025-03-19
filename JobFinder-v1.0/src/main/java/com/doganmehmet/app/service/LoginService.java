@@ -1,6 +1,6 @@
 package com.doganmehmet.app.service;
 
-import com.doganmehmet.app.dto.LoginRequestDTO;
+import com.doganmehmet.app.dto.login.LoginRequestDTO;
 import com.doganmehmet.app.exception.ApiException;
 import com.doganmehmet.app.security.CustomAuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
