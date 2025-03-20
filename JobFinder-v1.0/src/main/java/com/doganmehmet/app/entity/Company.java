@@ -17,10 +17,13 @@ public class Company {
     @Column(name = "company_id")
     private long companyId;
 
+    @Column(unique = true, nullable = false)
     private String name;
     private String industry;
     private String address;
+    @Column(unique = true, nullable = false)
     private String phone;
+    @Column(unique = true, nullable = false)
     private String email;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
