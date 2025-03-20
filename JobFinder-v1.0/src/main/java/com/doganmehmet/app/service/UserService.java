@@ -2,6 +2,7 @@ package com.doganmehmet.app.service;
 
 import com.doganmehmet.app.dto.jobposting.JobPostingDTO;
 import com.doganmehmet.app.dto.register.RegisterRequestDTO;
+import com.doganmehmet.app.dto.user.UpdateUserDTO;
 import com.doganmehmet.app.dto.user.UserDTO;
 import com.doganmehmet.app.entity.JobApplication;
 import com.doganmehmet.app.entity.JobPosting;
@@ -46,14 +47,14 @@ public class UserService {
         m_jobPostingMapper = jobPostingMapper;
     }
 
-    private User updateUser(User user, RegisterRequestDTO registerRequestDTO)
+    private User updateUser(User user, UpdateUserDTO updateUserDTO)
     {
-        user.setFirstname(registerRequestDTO.getFirstname());
-        user.setLastname(registerRequestDTO.getLastname());
-        user.setPhone(registerRequestDTO.getPhone());
-        user.setExperience(registerRequestDTO.getExperience());
-        user.setYearsOfExperience(registerRequestDTO.getYearsOfExperience());
-        user.setSkills(registerRequestDTO.getSkills());
+        user.setFirstname(updateUserDTO.getFirstname());
+        user.setLastname(updateUserDTO.getLastname());
+        user.setPhone(updateUserDTO.getPhone());
+        user.setExperience(updateUserDTO.getExperience());
+        user.setYearsOfExperience(updateUserDTO.getYearsOfExperience());
+        user.setSkills(updateUserDTO.getSkills());
 
         return m_userRepository.save(user);
     }
@@ -62,6 +63,16 @@ public class UserService {
     {
         return user.getJobApplications().stream()
                 .anyMatch(jobApp -> jobApp.getJobPosting().equals(jobPosting));
+    }
+
+    private boolean checkIfMatch(User user, JobPosting jobPosting)
+    {
+        var jobSkills = jobPosting.getRequiredSkills().split("[, ]+");
+        var userSkills = user.getSkills().split("[, ]+");
+
+        return Arrays.stream(jobSkills)
+                .anyMatch(j -> Arrays.stream(userSkills).map(String::toUpperCase)
+                        .anyMatch(s -> s.equalsIgnoreCase(j)));
     }
 
     public UserDTO findUser(long userId)
@@ -83,26 +94,25 @@ public class UserService {
         return m_userMapper.toUserDTOPage(m_userRepository.findAll(pageable));
     }
 
-    public Page<UserDTO> findAllUserByCompany(long companyId, Pageable pageable)
+    public Page<UserDTO> findAllUserByCompany(long companyId, int page, int size)
     {
+        var pageable = PageRequest.of(page, size, Sort.by("firstname").ascending());
+
         var company = m_companyRepository.findById(companyId)
                 .orElseThrow(() -> new ApiException(MyError.COMPANY_NOT_FOUND));
 
         return m_userMapper.toUserDTOPage(m_userRepository.findAllByCompany(company, pageable));
     }
 
-    public UserDTO updateUser(long userId, RegisterRequestDTO registerRequestDTO)
+    public UpdateUserDTO updateUser(UpdateUserDTO updateUserDTO)
     {
-        var user = m_userRepository.findById(userId)
+        var user = m_userRepository.findByEmail(updateUserDTO.getEmail())
                 .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
 
-        if (!m_passwordEncoder.matches(registerRequestDTO.getPassword(), user.getPassword()))
+        if (!m_passwordEncoder.matches(updateUserDTO.getPassword(), user.getPassword()))
             throw new ApiException(MyError.PASSWORD_INCORRECT, "Please try again!");
 
-        if (!user.getEmail().equals(registerRequestDTO.getEmail()))
-            throw new ApiException(MyError.EMAIL_INCORRECT, registerRequestDTO.getEmail());
-
-        return m_userMapper.toUserDTO(updateUser(user, registerRequestDTO));
+        return m_userMapper.toUpdateUserDTO(updateUser(user, updateUserDTO));
     }
 
     public Page<UserDTO> searchUsers(String keyword, int page, int size)
@@ -168,14 +178,6 @@ public class UserService {
                 .toList();
 
         return m_jobPostingMapper.toJobPostingDTOList(jobPostings);
-    }
-
-    private boolean checkIfMatch(User user, JobPosting jobPosting)
-    {
-        var jobSkills = jobPosting.getRequiredSkills().split("[, ]+");
-        var userSkills = user.getSkills().split("[, ]+");
-
-        return Arrays.stream(jobSkills).anyMatch(j -> Arrays.asList(userSkills).contains(j));
     }
 
     @Transactional
