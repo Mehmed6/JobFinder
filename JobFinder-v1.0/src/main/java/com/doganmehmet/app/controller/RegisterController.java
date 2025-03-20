@@ -31,7 +31,10 @@ public class RegisterController {
     }
 
     @PostMapping
-    public String register(@Valid RegisterRequestDTO registerRequestDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes)
+    public String register(@Valid RegisterRequestDTO registerRequestDTO,
+                           BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes,
+                           Model model)
     {
         if (bindingResult.hasErrors())
             return "register/my-register";
@@ -40,7 +43,7 @@ public class RegisterController {
             m_registerService.register(registerRequestDTO);
         }
         catch (ApiException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("errorMessage", ex.getMessage());
             return "register/my-register";
         }
 
