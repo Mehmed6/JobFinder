@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Companies</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/pageable/pageable.css}">
+
+</head>
+<body>
+
+<div class="container">
+    <h2>All Companies</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Company Name</th>
+            <th>Industry</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>address</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="company : ${companies.getContent()}">
+            <td th:text="${company.name}"></td>
+            <td th:text="${company.industry}"></td>
+            <td th:text="${company.email}"></td>
+            <td th:text="${company.phone}"></td>
+            <td th:text="${company.address}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${companies.totalPages > 0}">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${companies.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/company/all(page=${companies.number - 1}, size=${companies.size})}">Previous</a>
+                </li>
+
+                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, companies.totalPages - 1)}"
+                    th:classappend="${pageNum == companies.number} ? 'active'"
+                    th:if="${pageNum >= companies.number - 2 && pageNum <= companies.number + 2}">
+                    <a class="page-link" th:href="@{/company/all(page=${pageNum}, size=${companies.size})}" th:text="${pageNum + 1}"></a>
+                </li>
+
+                <li class="page-item" th:classappend="${companies.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/company/all(page=${companies.number + 1}, size=${companies.size})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+</body>
+</html>

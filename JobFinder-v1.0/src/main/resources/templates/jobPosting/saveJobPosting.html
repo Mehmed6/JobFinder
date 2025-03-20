@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Job Posting</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/jobPosting/saveJobPosting.css}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Add Job Posting</h2>
+    <div th:if="${message}" class="alert alert-success text-center" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/job/posting/save}" th:object="${jobPostingRequestDTO}" method="post">
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" th:field="*{title}" required>
+            <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-danger small"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" th:field="*{description}" rows="3" required></textarea>
+            <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger small"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" th:field="*{location}" required>
+            <div th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="text-danger small"></div>
+
+        </div>
+
+        <div class="mb-3">
+            <label for="requiredSkills" class="form-label">Required Skills</label>
+            <input type="text" class="form-control" id="requiredSkills" th:field="*{requiredSkills}" required>
+            <div th:if="${#fields.hasErrors('requiredSkills')}" th:errors="*{requiredSkills}" class="text-danger small"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="minExperience" class="form-label">Minimum Experience (Years)</label>
+            <input type="number" class="form-control" id="minExperience" th:field="*{minExperience}" min="0" required>
+            <div th:if="${#fields.hasErrors('minExperience')}" th:errors="*{minExperience}" class="text-danger small"></div>
+        </div>
+
+        <div class="mb-3">
+            <label for="company" class="form-label">Company</label>
+            <select class="form-select" id="company" th:field="*{companyName}" required>
+                <option value="">Select a company</option>
+                <option th:each="company : ${companies}" th:value="${company.name}" th:text="${company.name}"></option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-submit">Add Job Posting</button>
+
+    </form>
+</div>
+
+</body>
+</html>

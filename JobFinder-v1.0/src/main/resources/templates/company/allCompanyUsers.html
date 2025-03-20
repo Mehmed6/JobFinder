@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Company Users</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" th:href="@{/css/pageable/pageable.css}">
+</head>
+<body>
+
+<div class="container">
+  <h2>All Company Users</h2>
+
+  <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Experience (Years)</th>
+      <th>Experience Level</th>
+      <th>Skills</th>
+      <th>Company</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users.getContent()}">
+      <td th:text="${user.firstname}"></td>
+      <td th:text="${user.lastname}"></td>
+      <td th:text="${user.email}"></td>
+      <td th:text="${user.phone}"></td>
+      <td th:text="${user.yearsOfExperience}"></td>
+      <td th:text="${user.experience}"></td>
+      <td th:text="${user.skills}"></td>
+      <td th:text="${user.companyName}"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div th:if="${users.totalPages > 0}">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+          <a class="page-link" th:href="@{|/company/all/users/${companyId}?page=${users.number - 1}&size=${users.size}|}">Previous</a>
+        </li>
+
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, users.totalPages - 1)}"
+            th:classappend="${pageNum == users.number} ? 'active'"
+            th:if="${pageNum >= users.number - 2 && pageNum <= users.number + 2}">
+          <a class="page-link" th:href="@{|/company/all/users/${companyId}?page=${pageNum}&size=${users.size}|}" th:text="${pageNum + 1}"></a>
+        </li>
+
+        <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+          <a class="page-link" th:href="@{|/company/all/users/${companyId}?page=${users.number + 1}&size=${users.size}|}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+</div>
+
+</body>
+</html>

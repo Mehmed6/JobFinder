@@ -1,0 +1,28 @@
+body {
+    background-color: #f4f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 50%;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.btn-submit {
+    background-color: #4CAF50;
+    color: white;
+    width: 100%;
+}
+.btn-submit:hover {
+    background-color: #45a049;
+}
