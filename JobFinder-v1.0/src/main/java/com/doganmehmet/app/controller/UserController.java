@@ -65,8 +65,14 @@ public class UserController {
                                 @RequestParam(defaultValue = "5") int size, Model model)
     {
 
-        model.addAttribute("users",
-                m_userService.findByExperienceYears(minExperience, maxExperience, page, size));
+        var users = m_userService.findByExperienceYears(minExperience, maxExperience, page, size);
+
+        if (users.getTotalElements() == 0) {
+            model.addAttribute("message", "No users found");
+            return "error/errorPage";
+        }
+
+        model.addAttribute("users", users);
         model.addAttribute("minExperience", minExperience);
         model.addAttribute("maxExperience", maxExperience);
         return "user/experienceBetween";
@@ -89,8 +95,13 @@ public class UserController {
     {
         try {
             var users = m_userService.findAllUserByCompany(companyId, page, size);
+
+            if (users.getTotalElements() == 0) {
+                model.addAttribute("errorMessage", "No users found for this company");
+                return "error/errorPage";
+            }
             model.addAttribute("users", users);
-            return "user/allUsers";
+            return "user/allUsersCompany";
         }
         catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -107,27 +118,29 @@ public class UserController {
     {
         var users = m_userService.searchUsers(keyword, page, size);
 
-        if (users.getTotalElements() == 0)
+        if (users.getTotalElements() == 0) {
             model.addAttribute("errorMessage", "No user found with the entered qualifications.");
+            return "error/errorPage";
+        }
 
         model.addAttribute("users", users);
         model.addAttribute("keyword", keyword);
         return "user/searchUsers";
     }
 
-    @GetMapping("/job/posting")
-    public String showJobPostingPage(@RequestParam long userId, Model model)
+    @GetMapping("/job/posting/{userId}")
+    public String showJobPostingPage(@PathVariable long userId, Model model)
     {
         try {
             var jobs = m_userService.getRecommendedJobs(userId);
 
             if (jobs.isEmpty()) {
                 model.addAttribute("errorMessage", "No jobs found");
-                return "jobPosting/jobPosting";
+                return "user/userAllJobPosting";
             }
 
             model.addAttribute("jobPostingDTO", jobs);
-            return "jobPosting/jobPosting";
+            return "user/userAllJobPosting";
         }
         catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());

@@ -117,11 +117,12 @@ public class UserService {
 
     public Page<UserDTO> searchUsers(String keyword, int page, int size)
     {
-        var pageable = PageRequest.of(page, size, Sort.by("firstname").ascending());
+        var pageable = PageRequest.of(page, size);
 
-        return m_userMapper.toUserDTOPage(
-                m_userRepository.
-                        findAllBySkillsOrExperienceContainsIgnoreCase(keyword, keyword, pageable));
+        var users = m_userRepository
+                .findAllBySkillsOrExperienceContainsIgnoreCase(keyword, keyword, pageable);
+
+        return m_userMapper.toUserDTOPage(users);
     }
 
     public Page<UserDTO> findExperienceYearsLessThanEqual(int maxExperience, int page, int size)
