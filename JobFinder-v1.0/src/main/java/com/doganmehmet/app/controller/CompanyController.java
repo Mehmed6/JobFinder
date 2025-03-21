@@ -91,4 +91,26 @@ public class CompanyController {
 
         return "company/company";
     }
+
+    @GetMapping("/show/all/job/postings/{companyId}")
+    public String showAllCompanyJobPostings(@PathVariable long companyId,
+                                            @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "5") int size, Model model)
+    {
+        try {
+            var jobPostingDTO = m_companyService.getAllJobPostingsByCompanyId(companyId, page, size);
+
+            if (jobPostingDTO.getTotalElements() == 0) {
+                model.addAttribute("errorMessage", "No job postings found for this company");
+                return "error/errorPage";
+            }
+
+            model.addAttribute("jobPostingDTO", jobPostingDTO);
+            return "company/companyAllJobPosting";
+        }
+        catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error/errorPage";
+        }
+    }
 }
