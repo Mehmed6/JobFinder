@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JobPostingDTO {
+    private long jobPostingId;
     private String title;
     private String description;
     private String location;

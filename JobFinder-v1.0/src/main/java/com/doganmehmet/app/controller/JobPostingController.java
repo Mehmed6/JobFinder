@@ -2,8 +2,10 @@ package com.doganmehmet.app.controller;
 
 import com.doganmehmet.app.dto.jobposting.JobPostingRequestDTO;
 import com.doganmehmet.app.repository.ICompanyRepository;
+import com.doganmehmet.app.repository.IUserRepository;
 import com.doganmehmet.app.service.JobPostingService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,11 +17,13 @@ public class JobPostingController {
 
     private final JobPostingService m_jobPostingService;
     private final ICompanyRepository m_companyRepository;
+    private final IUserRepository m_userRepository;
 
-    public JobPostingController(JobPostingService jobPostingService, ICompanyRepository companyRepository)
+    public JobPostingController(JobPostingService jobPostingService, ICompanyRepository companyRepository, IUserRepository userRepository)
     {
         m_jobPostingService = jobPostingService;
         m_companyRepository = companyRepository;
+        m_userRepository = userRepository;
     }
 
     @GetMapping("/save")
@@ -39,7 +43,6 @@ public class JobPostingController {
         if (bindingResult.hasErrors())
             return "jobPosting/saveJobPosting";
 
-
         try {
             m_jobPostingService.save(jobPostingRequestDTO);
         }
@@ -54,10 +57,30 @@ public class JobPostingController {
         return "jobPosting/saveJobPosting";
     }
 
+    @GetMapping("/show/{jobPostingId}")
+    public String showJobPosting(@PathVariable long jobPostingId, Model model)
+    {
+        try {
+            var jobPostingDTO = m_jobPostingService.findJobPostingById(jobPostingId);
+            model.addAttribute("jobPostingDTO", jobPostingDTO);
+        }
+        catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error/errorPage";
+        }
+
+        return "jobPosting/jobPosting";
+    }
+
     @GetMapping("/show/all")
     public String showAllJobPostings(@RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "5") int size, Model model)
     {
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = m_userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        model.addAttribute("userId", user.getUserId());
+        
         model.addAttribute("jobPostingDTO", m_jobPostingService.findAllJobPostings(page, size));
         return "jobPosting/jobPostingAll";
     }

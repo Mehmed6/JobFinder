@@ -11,7 +11,6 @@
 <body>
 <div class="container mt-5">
   <h2 class="text-center mb-4">Job Postings</h2>
-  <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
   <div class="row">
     <div class="col-md-12">
       <div class="list-group">
@@ -26,6 +25,13 @@
             <p><strong>Minimum Experience:</strong> <span th:text="${jobPosting.minExperience}"></span> years</p>
             <p><strong>Company:</strong> <span th:text="${jobPosting.companyName}"></span></p>
             <p><strong>Status:</strong> <span th:text="${jobPosting.isActive ? 'Active' : 'Inactive'}"></span></p>
+            <form th:action="@{/job/application/save}" method="post">
+              <input type="hidden" name="jobPostingId" th:value="${jobPosting.jobPostingId}" />
+              <input type="hidden" name="userId" th:value="${userId}" />
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Apply Now</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
