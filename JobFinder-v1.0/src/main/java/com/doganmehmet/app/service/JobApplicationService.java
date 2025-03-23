@@ -2,6 +2,7 @@ package com.doganmehmet.app.service;
 
 import com.doganmehmet.app.dto.jobapplication.JobApplicationRequest;
 import com.doganmehmet.app.entity.JobApplication;
+import com.doganmehmet.app.entity.User;
 import com.doganmehmet.app.exception.ApiException;
 import com.doganmehmet.app.exception.MyError;
 import com.doganmehmet.app.repository.IJobApplicationRepository;
@@ -36,10 +37,19 @@ public class JobApplicationService {
         }
     }
 
+    private boolean checkUserAlreadyApplied(User user, long jobPostingId)
+    {
+        return user.getJobApplications().stream().anyMatch(jobApplication ->
+                jobApplication.getJobPosting().getJobPostingId() == jobPostingId);
+    }
+
     public void save(JobApplicationRequest jobApplicationRequest)
     {
         var user = m_userRepository.findById(jobApplicationRequest.getUserId())
                 .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
+
+        if (checkUserAlreadyApplied(user, jobApplicationRequest.getJobPostingId()))
+            throw new ApiException(MyError.JOB_ALREADY_APPLIED);
 
         var jobPosting = m_jobPostingRepository.findById(jobApplicationRequest.getJobPostingId())
                 .orElseThrow(() -> new ApiException(MyError.JOB_NOT_FOUND));
@@ -60,7 +70,7 @@ public class JobApplicationService {
     {
         var pageable = PageRequest.of(page, size);
         var jobPosting = m_jobPostingRepository.findById(jobPostingId)
-                .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(MyError.JOB_NOT_FOUND));
 
         return m_jobApplicationRepository.findAllByJobPosting(jobPosting, pageable);
     }
