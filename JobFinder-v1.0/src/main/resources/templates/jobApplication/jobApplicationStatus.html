@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Basvuru Bilgisi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid black;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+  </style>
+</head>
+<body>
+
+<h2>Basvuru Bilgisi</h2>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>Basvuran Aday</th>
+    <th>İlanı Baslığı</th>
+    <th>Aday Detayı</th>
+    <th>Ilan Detayı</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="jobApplication : ${jobApplicationDTO.getContent()}">
+    <td th:text="|${jobApplication.user.firstname} ${jobApplication.user.lastname}|"></td>
+    <td th:text="${jobApplication.jobPosting.title}"></td>
+    <td><a th:href="@{'/user/show/' + ${jobApplication.user.userId}}">Adayı Gör</a></td>
+    <td><a th:href="@{'/job/posting/show/' + ${jobApplication.jobPosting.jobPostingId}}">İlanı Gör</a></td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

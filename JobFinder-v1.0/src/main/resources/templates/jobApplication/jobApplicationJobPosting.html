@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Basvuran Adaylar</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid black;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+  </style>
+</head>
+<body>
+
+<h2>Basvuran Adaylar</h2>
+
+<table>
+  <thead>
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Experience (Years)</th>
+    <th>Experience Level</th>
+    <th>Skills</th>
+    <th>Company</th>
+    <th>Detay</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="jobApplication : ${jobApplicationDTO.getContent()}">
+    <td th:text="${jobApplication.user.firstname}"></td>
+    <td th:text="${jobApplication.user.lastname}"></td>
+    <td th:text="${jobApplication.user.email}"></td>
+    <td th:text="${jobApplication.user.phone}"></td>
+    <td th:text="${jobApplication.user.yearsOfExperience}"></td>
+    <td th:text="${jobApplication.user.experience}"></td>
+    <td th:text="${jobApplication.user.skills}"></td>
+    <td th:text="${jobApplication.user.company?.name ?: '-'}"></td>
+    <td><a th:href="@{'/user/show/' + ${jobApplication.user.userId}}">Adayı Gör</a></td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
