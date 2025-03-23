@@ -39,6 +39,12 @@ public class JobPostingService {
         m_jobPostingMapper.toJobPostingDTO(m_jobPostingRepository.save(jobPosting));
     }
 
+    public JobPostingDTO findJobPostingById(long jobPostingId)
+    {
+        return m_jobPostingMapper.toJobPostingDTO(m_jobPostingRepository.findById(jobPostingId)
+                .orElseThrow(() -> new ApiException(MyError.JOB_NOT_FOUND)));
+
+    }
     public Page<JobPostingDTO> findAllJobPostings(int page, int size)
     {
         var pageable = PageRequest.of(page, size, Sort.by("title").ascending());
