@@ -24,7 +24,10 @@
             <input type="number" class="form-control" id="jobPostingId" name="jobPostingId" required>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Apply</button>
+        <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-primary w-25">Apply</button>
+            <a th:href="@{/job/posting/show/all}" class="btn btn-secondary w-25">View Job Listings</a>
+        </div>
     </form>
 </div>
 

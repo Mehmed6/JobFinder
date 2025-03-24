@@ -26,6 +26,13 @@
             <p><strong>Minimum Experience:</strong> <span th:text="${jobPostingDTO.minExperience}"></span> years</p>
             <p><strong>Company:</strong> <span th:text="${jobPostingDTO.companyName}"></span></p>
             <p><strong>Status:</strong> <span th:text="${jobPostingDTO.isActive ? 'Active' : 'Inactive'}"></span></p>
+            <form th:action="@{/job/application/save}" method="post">
+              <input type="hidden" name="jobPostingId" th:value="${jobPostingId}" />
+              <input type="hidden" name="userId" th:value="${userId}" />
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Apply Now</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

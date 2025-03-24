@@ -2,52 +2,54 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Basvuru Bilgisi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid black;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f4f4f4;
-    }
-
-  </style>
+  <title>Application Details</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" th:href="@{/css/jobApplication/jobApplication.css}">
 </head>
 <body>
 
-<h2>Basvuru Bilgisi</h2>
+<div class="container">
+  <h2>Application Details</h2>
 
-<table border="1">
-  <thead>
-  <tr>
-    <th>Basvuran Aday</th>
-    <th>İlanı Baslığı</th>
-    <th>Aday Detayı</th>
-    <th>Ilan Detayı</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="jobApplication : ${jobApplicationDTO.getContent()}">
-    <td th:text="|${jobApplication.user.firstname} ${jobApplication.user.lastname}|"></td>
-    <td th:text="${jobApplication.jobPosting.title}"></td>
-    <td><a th:href="@{'/user/show/' + ${jobApplication.user.userId}}">Adayı Gör</a></td>
-    <td><a th:href="@{'/job/posting/show/' + ${jobApplication.jobPosting.jobPostingId}}">İlanı Gör</a></td>
-  </tr>
-  </tbody>
-</table>
+  <table>
+    <thead>
+    <tr>
+      <th>Applicant</th>
+      <th>Job Title</th>
+      <th>Applicant Details</th>
+      <th>Job Details</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="jobApplication : ${jobApplications.getContent()}">
+      <td th:text="|${jobApplication.user.firstname} ${jobApplication.user.lastname}|"></td>
+      <td th:text="${jobApplication.jobPosting.title}"></td>
+      <td><a th:href="@{'/user/show/' + ${jobApplication.user.userId}}" class="btn">View Applicant</a></td>
+      <td><a th:href="@{'/job/posting/show/' + ${jobApplication.jobPosting.jobPostingId}}" class="btn">View Job</a></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div th:if="${jobApplications.totalPages > 0}">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${jobApplications.first} ? 'disabled'">
+          <a class="page-link" th:href="@{|/job/application/show/status/${status}?page=${jobApplications.number - 1}&size=${jobApplications.size}|}">Previous</a>
+        </li>
+
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, jobApplications.totalPages - 1)}"
+            th:classappend="${pageNum == jobApplications.number} ? 'active'"
+            th:if="${pageNum >= jobApplications.number - 2 && pageNum <= jobApplications.number + 2}">
+          <a class="page-link" th:href="@{|/job/application/show/status/${status}?page=${pageNum}&size=${jobApplications.size}|}" th:text="${pageNum + 1}"></a>
+        </li>
+
+        <li class="page-item" th:classappend="${jobApplications.last} ? 'disabled'">
+          <a class="page-link" th:href="@{|/job/application/show/status/${status}?page=${jobApplications.number + 1}&size=${jobApplications.size}|}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
 
 </body>
 </html>
