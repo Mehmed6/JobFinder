@@ -2,7 +2,7 @@ package com.doganmehmet.app.repository;
 
 import com.doganmehmet.app.entity.Company;
 import com.doganmehmet.app.entity.User;
-import com.doganmehmet.app.role.Role;
+import com.doganmehmet.app.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,12 +17,6 @@ public interface IUserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
-
-    Page<User> findByExperienceGreaterThanEqual(String experienceIsGreaterThan, Pageable pageable);
-
-    Page<User> findByExperienceLessThanEqual(String experienceIsLessThan, Pageable pageable);
-
-    Page<User> findByYearsOfExperienceIsLessThanEqual(int yearsOfExperienceIsLessThan, Pageable pageable);
 
     Page<User> findByYearsOfExperienceBetween(int yearsOfExperienceAfter, int yearsOfExperienceBefore, Pageable pageable);
 

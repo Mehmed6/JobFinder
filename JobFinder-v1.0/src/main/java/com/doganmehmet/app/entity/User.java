@@ -1,6 +1,6 @@
 package com.doganmehmet.app.entity;
 
-import com.doganmehmet.app.role.Role;
+import com.doganmehmet.app.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

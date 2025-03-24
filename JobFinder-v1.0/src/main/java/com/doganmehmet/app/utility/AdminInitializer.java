@@ -2,7 +2,7 @@ package com.doganmehmet.app.utility;
 
 import com.doganmehmet.app.entity.User;
 import com.doganmehmet.app.repository.IUserRepository;
-import com.doganmehmet.app.role.Role;
+import com.doganmehmet.app.enums.Role;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;

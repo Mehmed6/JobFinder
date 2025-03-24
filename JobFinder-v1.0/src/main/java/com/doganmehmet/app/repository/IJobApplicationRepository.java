@@ -3,7 +3,7 @@ package com.doganmehmet.app.repository;
 import com.doganmehmet.app.entity.JobApplication;
 import com.doganmehmet.app.entity.JobPosting;
 import com.doganmehmet.app.entity.User;
-import com.doganmehmet.app.role.ApplicationStatus;
+import com.doganmehmet.app.enums.ApplicationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

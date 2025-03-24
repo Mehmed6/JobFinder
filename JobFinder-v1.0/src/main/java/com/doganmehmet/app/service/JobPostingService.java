@@ -2,12 +2,13 @@ package com.doganmehmet.app.service;
 
 import com.doganmehmet.app.dto.jobposting.JobPostingDTO;
 import com.doganmehmet.app.dto.jobposting.JobPostingRequestDTO;
-import com.doganmehmet.app.entity.JobPosting;
+import com.doganmehmet.app.enums.LogType;
 import com.doganmehmet.app.exception.ApiException;
 import com.doganmehmet.app.exception.MyError;
 import com.doganmehmet.app.mapper.IJobPostingMapper;
 import com.doganmehmet.app.repository.ICompanyRepository;
 import com.doganmehmet.app.repository.IJobPostingRepository;
+import com.doganmehmet.app.utility.LogUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -36,6 +37,7 @@ public class JobPostingService {
         company.getJobPostings().add(jobPosting);
         m_companyRepository.save(company);
 
+        LogUtil.log(company.getName(), "Job posting saved", LogType.SUCCESSFUL);
         m_jobPostingMapper.toJobPostingDTO(m_jobPostingRepository.save(jobPosting));
     }
 

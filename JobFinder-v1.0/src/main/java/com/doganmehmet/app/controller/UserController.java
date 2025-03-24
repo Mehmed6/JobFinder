@@ -1,5 +1,6 @@
 package com.doganmehmet.app.controller;
 
+import com.doganmehmet.app.dto.jobapplication.JobApplicationRequest;
 import com.doganmehmet.app.dto.user.UpdateUserDTO;
 import com.doganmehmet.app.service.UserService;
 import jakarta.validation.Valid;
@@ -148,4 +149,28 @@ public class UserController {
         }
     }
 
+    @GetMapping("/apply/job")
+    public String showApplyJobPage()
+    {
+        return "redirect:/job/application/save";
+    }
+
+    @PostMapping("/apply/job")
+    public String applyJob(@Valid JobApplicationRequest jobApplicationRequest, BindingResult bindingResult, Model model)
+    {
+        if (bindingResult.hasErrors())
+            return "jobApplication/saveJobApplication";
+
+        try {
+            m_userService.applyForJob(jobApplicationRequest);
+        }
+        catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error/errorPage";
+        }
+
+        model.addAttribute("message", "Job Application Successfully Saved");
+        return "jobApplication/saveJobApplication";
+
+    }
 }

@@ -1,24 +1,23 @@
 package com.doganmehmet.app.service;
 
+import com.doganmehmet.app.dto.jobapplication.JobApplicationRequest;
 import com.doganmehmet.app.dto.jobposting.JobPostingDTO;
-import com.doganmehmet.app.dto.register.RegisterRequestDTO;
 import com.doganmehmet.app.dto.user.UpdateUserDTO;
 import com.doganmehmet.app.dto.user.UserDTO;
-import com.doganmehmet.app.entity.JobApplication;
 import com.doganmehmet.app.entity.JobPosting;
 import com.doganmehmet.app.entity.User;
+import com.doganmehmet.app.enums.LogType;
 import com.doganmehmet.app.exception.ApiException;
 import com.doganmehmet.app.exception.MyError;
 import com.doganmehmet.app.mapper.IJobPostingMapper;
 import com.doganmehmet.app.mapper.IUserMapper;
 import com.doganmehmet.app.repository.ICompanyRepository;
-import com.doganmehmet.app.repository.IJobApplicationRepository;
 import com.doganmehmet.app.repository.IJobPostingRepository;
 import com.doganmehmet.app.repository.IUserRepository;
+import com.doganmehmet.app.utility.LogUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,17 +31,20 @@ public class UserService {
     private final IUserMapper m_userMapper;
     private final ICompanyRepository m_companyRepository;
     private final BCryptPasswordEncoder m_passwordEncoder;
-    private final IJobApplicationRepository m_jobApplicationRepository;
     private final IJobPostingRepository m_jobPostingRepository;
     private final IJobPostingMapper m_jobPostingMapper;
 
-    public UserService(IUserRepository userRepository, IUserMapper userMapper, ICompanyRepository companyRepository, BCryptPasswordEncoder passwordEncoder, IJobApplicationRepository jobApplicationRepository, IJobPostingRepository jobPostingRepository, IJobPostingMapper jobPostingMapper)
+    public UserService(IUserRepository userRepository,
+                       IUserMapper userMapper,
+                       ICompanyRepository companyRepository,
+                       BCryptPasswordEncoder passwordEncoder,
+                       IJobPostingRepository jobPostingRepository,
+                       IJobPostingMapper jobPostingMapper)
     {
         m_userRepository = userRepository;
         m_userMapper = userMapper;
         m_companyRepository = companyRepository;
         m_passwordEncoder = passwordEncoder;
-        m_jobApplicationRepository = jobApplicationRepository;
         m_jobPostingRepository = jobPostingRepository;
         m_jobPostingMapper = jobPostingMapper;
     }
@@ -112,6 +114,7 @@ public class UserService {
         if (!m_passwordEncoder.matches(updateUserDTO.getPassword(), user.getPassword()))
             throw new ApiException(MyError.PASSWORD_INCORRECT, "Please try again!");
 
+        LogUtil.log(user.getEmail(), "User updated successfully", LogType.SUCCESSFUL);
         return m_userMapper.toUpdateUserDTO(updateUser(user, updateUserDTO));
     }
 
@@ -125,45 +128,19 @@ public class UserService {
         return m_userMapper.toUserDTOPage(users);
     }
 
-    public Page<UserDTO> findExperienceYearsLessThanEqual(int maxExperience, int page, int size)
+    public void applyForJob(JobApplicationRequest request)
     {
-        var pageable = PageRequest.of(page, size, Sort.by("yearsOfExperience").descending());
-
-        return m_userMapper.toUserDTOPage(
-                m_userRepository.findByYearsOfExperienceIsLessThanEqual(maxExperience, pageable));
-
-    }
-
-    public List<JobApplication> getUserJobApplications(long userId)
-    {
-        var user = m_userRepository.findById(userId)
+        var user = m_userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
 
-        return user.getJobApplications();
-    }
-
-    public void applyForJob(long userId, long jobId)
-    {
-        var user = m_userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
-
-        var job = m_jobPostingRepository.findById(jobId)
+        var job = m_jobPostingRepository.findById(request.getJobPostingId())
                 .orElseThrow(() -> new ApiException(MyError.JOB_NOT_FOUND));
 
         if (isJobAlreadyAppliedByUser(user, job))
             throw new ApiException(MyError.JOB_ALREADY_APPLIED);
 
-        var jobApplication = new JobApplication();
+        LogUtil.log(user.getEmail(), "Applying job", LogType.SUCCESSFUL);
 
-        jobApplication.setUser(user);
-        jobApplication.setJobPosting(job);
-
-        user.getJobApplications().add(jobApplication);
-        job.getJobApplications().add(jobApplication);
-
-        m_userRepository.save(user);
-        m_jobPostingRepository.save(job);
-        m_jobApplicationRepository.save(jobApplication);
     }
 
     public List<JobPostingDTO> getRecommendedJobs(long userId)
@@ -184,6 +161,10 @@ public class UserService {
     @Transactional
     public void deleteUser(long userId)
     {
+        var user = m_userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
+
+        LogUtil.log(user.getEmail(), "User deleted successfully", LogType.SUCCESSFUL);
         m_userRepository.deleteById(userId);
     }
 }

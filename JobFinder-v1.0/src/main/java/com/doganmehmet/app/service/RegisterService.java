@@ -1,10 +1,12 @@
 package com.doganmehmet.app.service;
 
 import com.doganmehmet.app.dto.register.RegisterRequestDTO;
+import com.doganmehmet.app.enums.LogType;
 import com.doganmehmet.app.exception.ApiException;
 import com.doganmehmet.app.exception.MyError;
 import com.doganmehmet.app.mapper.IUserMapper;
 import com.doganmehmet.app.repository.IUserRepository;
+import com.doganmehmet.app.utility.LogUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class RegisterService {
         var user = m_userMapper.toUser(registerRequestDTO);
         user.setPassword(m_passwordEncoder.encode(registerRequestDTO.getPassword()));
 
+        LogUtil.log(user.getEmail(),"Register Successfully!", LogType.REGISTER);
         m_userRepository.save(user);
     }
 }
