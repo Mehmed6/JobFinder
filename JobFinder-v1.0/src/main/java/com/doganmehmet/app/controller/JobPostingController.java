@@ -1,10 +1,13 @@
 package com.doganmehmet.app.controller;
 
 import com.doganmehmet.app.dto.jobposting.JobPostingRequestDTO;
+import com.doganmehmet.app.exception.ApiException;
+import com.doganmehmet.app.exception.MyError;
 import com.doganmehmet.app.repository.ICompanyRepository;
 import com.doganmehmet.app.repository.IUserRepository;
 import com.doganmehmet.app.service.JobPostingService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +29,15 @@ public class JobPostingController {
         m_userRepository = userRepository;
     }
 
+    private void setUser(Model model)
+    {
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = m_userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiException(MyError.USER_NOT_FOUND));
+
+        model.addAttribute("userId", user.getUserId());
+    }
+
     @GetMapping("/save")
     public String showJobPostingSavePage(Model model)
     {
@@ -35,6 +47,7 @@ public class JobPostingController {
     }
 
     @PostMapping("/save")
+    @PreAuthorize("hasRole('ADMIN')")
     public String saveJobPosting(@Valid JobPostingRequestDTO jobPostingRequestDTO, BindingResult bindingResult,Model model)
     {
         var companies = m_companyRepository.findAll();
@@ -61,8 +74,10 @@ public class JobPostingController {
     public String showJobPosting(@PathVariable long jobPostingId, Model model)
     {
         try {
+            setUser(model);
             var jobPostingDTO = m_jobPostingService.findJobPostingById(jobPostingId);
             model.addAttribute("jobPostingDTO", jobPostingDTO);
+            model.addAttribute("jobPostingId", jobPostingId);
         }
         catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -76,11 +91,8 @@ public class JobPostingController {
     public String showAllJobPostings(@RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "5") int size, Model model)
     {
-        var email = SecurityContextHolder.getContext().getAuthentication().getName();
-        var user = m_userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        model.addAttribute("userId", user.getUserId());
-        
+        setUser(model);
+
         model.addAttribute("jobPostingDTO", m_jobPostingService.findAllJobPostings(page, size));
         return "jobPosting/jobPostingAll";
     }
@@ -91,6 +103,7 @@ public class JobPostingController {
                                                 @RequestParam(defaultValue = "5") int size, Model model)
     {
         try {
+            setUser(model);
             var jobPostingDTO = m_jobPostingService.findAllJobPostingsByCompany(companyId, page, size);
 
             if (jobPostingDTO.getTotalElements() == 0) {
@@ -112,6 +125,8 @@ public class JobPostingController {
                                     @RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "5") int size, Model model)
     {
+        setUser(model);
+
         var jobPostingDTO = m_jobPostingService.searchAllJobPostings(keyword, page, size);
 
         if (jobPostingDTO.getTotalElements() == 0) {
@@ -128,6 +143,8 @@ public class JobPostingController {
                                                  @RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "5") int size, Model model)
     {
+        setUser(model);
+
         var jobPostingDTO = m_jobPostingService.findAllJobPostingsByExperience(minExperience, page, size);
 
         if (jobPostingDTO.getTotalElements() == 0) {
@@ -143,6 +160,8 @@ public class JobPostingController {
     public String showAllActiveJocPostings(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "5") int size, Model model)
     {
+        setUser(model);
+
         var jobPostingDTO = m_jobPostingService.findAllActiveJobPostings(page, size);
 
         if (jobPostingDTO.getTotalElements() == 0) {
@@ -159,6 +178,8 @@ public class JobPostingController {
                                                @RequestParam(defaultValue = "0") int page,
                                                @RequestParam(defaultValue = "5") int size, Model model)
     {
+        setUser(model);
+
         var jobPostingDTO = m_jobPostingService.findAllJobPostingsByLocation(location, page, size);
 
         if (jobPostingDTO.getTotalElements() == 0) {

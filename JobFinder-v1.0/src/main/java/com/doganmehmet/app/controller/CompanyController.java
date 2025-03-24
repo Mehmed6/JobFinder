@@ -1,9 +1,13 @@
 package com.doganmehmet.app.controller;
 
 import com.doganmehmet.app.dto.company.CompanyRequestDTO;
+import com.doganmehmet.app.enums.LogType;
 import com.doganmehmet.app.exception.ApiException;
 import com.doganmehmet.app.service.CompanyService;
+import com.doganmehmet.app.utility.LogUtil;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +31,7 @@ public class CompanyController {
     }
 
     @PostMapping("/save")
+    @PreAuthorize("hasRole('ADMIN')")
     public String saveCompany(@Valid CompanyRequestDTO companyRequestDTO, BindingResult bindingResult, Model model)
     {
         if (bindingResult.hasErrors())
@@ -42,6 +47,9 @@ public class CompanyController {
 
         model.addAttribute("companyRequestDTO", companyRequestDTO);
         model.addAttribute("message", "Company saved successfully");
+
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        LogUtil.log(email, "Company saved successfully", LogType.SUCCESSFUL);
         return "company/saveCompany";
     }
 

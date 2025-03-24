@@ -3,6 +3,7 @@ package com.doganmehmet.app.config;
 import com.doganmehmet.app.security.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
@@ -10,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final String LOGIN = "/auth/login";
@@ -31,7 +33,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception ->
                         exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .logout(logout -> logout
-                        .logoutUrl("logout")
+                        .logoutUrl("/logout")
                         .logoutSuccessUrl(LOGIN)
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)

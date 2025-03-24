@@ -1,15 +1,21 @@
 package com.doganmehmet.app.controller;
 
 import com.doganmehmet.app.dto.jobapplication.JobApplicationRequest;
+import com.doganmehmet.app.enums.LogType;
 import com.doganmehmet.app.service.JobApplicationService;
+import com.doganmehmet.app.utility.LogUtil;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/job/application")
+@PreAuthorize("hasRole('ADMIN')")
 public class JobApplicationController {
 
     private final JobApplicationService m_jobApplicationService;
@@ -32,8 +38,10 @@ public class JobApplicationController {
         if (bindingResult.hasErrors())
             return "jobApplication/saveJobApplication";
 
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+
         try {
-            m_jobApplicationService.save(jobApplicationRequest);
+            m_jobApplicationService.save(jobApplicationRequest, email);
         }
         catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -50,14 +58,14 @@ public class JobApplicationController {
                                           @RequestParam(defaultValue = "5") int size, Model model)
     {
         try {
-            var jobApplicationDTO = m_jobApplicationService.findJobApplicationsByUser(userId, page, size);
+            var jobApplications = m_jobApplicationService.findJobApplicationsByUser(userId, page, size);
 
-            if (jobApplicationDTO.getTotalElements() == 0) {
+            if (jobApplications.getTotalElements() == 0) {
                 model.addAttribute("errorMessage", "User has not applied for any job postings!");
                 return "error/errorPage";
             }
 
-            model.addAttribute("jobApplicationDTO", jobApplicationDTO);
+            model.addAttribute("jobApplications", jobApplications);
         }
         catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -73,15 +81,15 @@ public class JobApplicationController {
                                                @RequestParam(defaultValue = "5") int size, Model model)
     {
         try {
-            var jobApplicationDTO = m_jobApplicationService
+            var jobApplications = m_jobApplicationService
                     .findJobApplicationsByJobPosting(jobPostingId, page, size);
 
-            if (jobApplicationDTO.getTotalElements() == 0) {
+            if (jobApplications.getTotalElements() == 0) {
                 model.addAttribute("errorMessage", "No applications found for this job posting!");
                 return "error/errorPage";
             }
 
-            model.addAttribute("jobApplicationDTO", jobApplicationDTO);
+            model.addAttribute("jobApplications", jobApplications);
         }
         catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -97,13 +105,13 @@ public class JobApplicationController {
                                             @RequestParam(defaultValue = "5") int size, Model model)
     {
         try {
-            var jobApplicationDTO = m_jobApplicationService.findJobApplicationsByStatus(status, page, size);
+            var jobApplications = m_jobApplicationService.findJobApplicationsByStatus(status, page, size);
 
-            if (jobApplicationDTO.getTotalElements() == 0) {
+            if (jobApplications.getTotalElements() == 0) {
                 model.addAttribute("errorMessage", "No applications found for this job status!");
                 return "error/errorPage";
             }
-            model.addAttribute("jobApplicationDTO", jobApplicationDTO);
+            model.addAttribute("jobApplications", jobApplications);
         }
         catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -111,5 +119,57 @@ public class JobApplicationController {
         }
 
         return "jobApplication/jobApplicationStatus";
+    }
+
+    @GetMapping("/show/all")
+    public String showAll(@RequestParam(defaultValue = "0") int page,
+                          @RequestParam(defaultValue = "5") int size, Model model)
+    {
+        var jobApplications = m_jobApplicationService.findAllJobApplication(page, size);
+
+        if (jobApplications.getTotalElements() == 0) {
+            model.addAttribute("errorMessage", "No applications found!");
+            return "error/errorPage";
+        }
+
+        model.addAttribute("jobApplications", jobApplications);
+        return "jobApplication/jobApplicationAll";
+    }
+
+    @PostMapping("/approve")
+    public String approved(@RequestParam long jobApplicationId,
+                           RedirectAttributes redirectAttributes,
+                           Model model)
+    {
+        try {
+            m_jobApplicationService.approveJobApplication(jobApplicationId);
+            redirectAttributes.addFlashAttribute("message", "Job Application Successfully Approved");
+        }
+        catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error/errorPage";
+        }
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        LogUtil.log(email, "Job Application Approved", LogType.APPROVED);
+        return "redirect:/job/application/show/all";
+    }
+
+    @PostMapping("/reject")
+    public String rejected(@RequestParam long jobApplicationId,
+                           RedirectAttributes redirectAttributes,
+                           Model model)
+    {
+        try {
+            m_jobApplicationService.rejectJobApplication(jobApplicationId);
+            redirectAttributes.addFlashAttribute("errorMessage", "Job Application Successfully Rejected");
+        }
+        catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "error/errorPage";
+        }
+
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        LogUtil.log(email, "Job Application Rejected", LogType.REJECTED);
+        return "redirect:/job/application/show/all";
     }
 }

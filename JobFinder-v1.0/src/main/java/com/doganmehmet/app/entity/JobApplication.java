@@ -1,6 +1,6 @@
 package com.doganmehmet.app.entity;
 
-import com.doganmehmet.app.role.ApplicationStatus;
+import com.doganmehmet.app.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
