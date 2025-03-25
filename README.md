@@ -3,7 +3,7 @@ JobFinder is a job search platform built with Spring Boot and Thymeleaf. Users c
 
 ## Features
 
-* **User Registration and Authentication:** Users must select one of the pre-registered banks during the registration process. After successful registration, they can log in. Users have three attempts to enter their password correctly. After three failed attempts, their account is locked for security reasons.
+* **User Registration and Authentication:** User registration is done through a form. After successful registration, they can log in. Users have three attempts to enter their password correctly. After three failed attempts, their account is locked for security reasons.
 * **Job Listings:** Users can filter job listings according to their preferences or view all job postings. Users cannot apply for jobs they have already applied to or jobs that are closed.
 * **Application Status:** Users can check whether their job applications have been accepted or not.
 * **Admin Roles:** Only users with the admin role can approve or reject job applications. Admins have access to all job applications and users. Admins can also create new job postings and register new companies.
