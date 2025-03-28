@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/job/application")
-@PreAuthorize("hasRole('ADMIN')")
 public class JobApplicationController {
 
     private final JobApplicationService m_jobApplicationService;
@@ -76,6 +75,7 @@ public class JobApplicationController {
     }
 
     @GetMapping("/show/by-job/posting/{jobPostingId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showJobPostingJobApplications(@PathVariable long jobPostingId,
                                                @RequestParam(defaultValue = "0") int page,
                                                @RequestParam(defaultValue = "5") int size, Model model)
@@ -100,6 +100,7 @@ public class JobApplicationController {
     }
 
     @GetMapping("/show/status/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showStatusJobApplications(@PathVariable String status,
                                             @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "5") int size, Model model)
@@ -122,6 +123,7 @@ public class JobApplicationController {
     }
 
     @GetMapping("/show/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showAll(@RequestParam(defaultValue = "0") int page,
                           @RequestParam(defaultValue = "5") int size, Model model)
     {
@@ -137,6 +139,7 @@ public class JobApplicationController {
     }
 
     @PostMapping("/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public String approved(@RequestParam long jobApplicationId,
                            RedirectAttributes redirectAttributes,
                            Model model)
@@ -155,6 +158,7 @@ public class JobApplicationController {
     }
 
     @PostMapping("/reject")
+    @PreAuthorize("hasRole('ADMIN')")
     public String rejected(@RequestParam long jobApplicationId,
                            RedirectAttributes redirectAttributes,
                            Model model)
