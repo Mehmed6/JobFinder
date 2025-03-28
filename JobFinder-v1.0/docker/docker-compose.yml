@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  job_finder_app:
+    image: job_finder
+    build: .
+    ports:
+      - "6767:6767"
+    depends_on:
+      - postgres_db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/job_finder
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: csd1993
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+  postgres_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: csd1993
+      POSTGRES_DB: job_finder
+    ports:
+      - "5432:5432"

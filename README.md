@@ -26,6 +26,7 @@ This project is developed to provide a simple and secure platform for job seeker
 * Java Reflection API
 * BufferedWriter
 * Pagination & Sorting
+* Docker & Docker Compose
 
 ## 🔗  Services
 
@@ -164,3 +165,7 @@ Provides utility methods to log actions in the application. The log method recor
 
 ### LoggingAspect
 This class is responsible for logging method executions in the controller and service layers of the application using Aspect-Oriented Programming (AOP). It logs HTTP request details before controller methods are executed, logs successful method executions after they return, and logs exceptions when they occur. Logs are saved to a file named ActivityLog.log under the logs directory. This class helps monitor the application's flow and detect any issues by recording method executions and exceptions.
+
+### Docker & Docker Compose:
+* The project includes a `docker-compose.yml` file that allows you to run the project in a Docker container.
+* To run the project with Docker and Docker Compose, you can easily start the application by using the Docker Compose file. After cloning the project, run the `docker-compose up --build` command to start the application along with all dependencies.
