@@ -26,3 +26,17 @@ h2 {
 .btn-submit:hover {
     background-color: #45a049;
 }
+.form-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.form-footer a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
