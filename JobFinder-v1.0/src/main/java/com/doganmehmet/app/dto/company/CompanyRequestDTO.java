@@ -17,6 +17,6 @@ public class CompanyRequestDTO {
     private String address;
     @NotBlank(message = "Phone cannot be empty!")
     private String phone;
-    @NotBlank(message = "Enail cannot be empty!")
+    @NotBlank(message = "Email cannot be empty!")
     private String email;
 }
